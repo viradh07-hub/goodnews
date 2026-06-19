@@ -1,6 +1,5 @@
 backend:
-  name: github
-  repo: viradh-07/goodnews
+  name: git-gateway
   branch: main
 
 media_folder: "images"
@@ -17,4 +16,4 @@ collections:
     fields:
       - { label: "Headline", name: "headline", widget: "string" }
       - { label: "Featured Image", name: "image", widget: "image" }
-      - { label: "Content Body", name: "body", widget: "markdown" }
+      - { label: "Content Body", name: "body", widget: "text" }
