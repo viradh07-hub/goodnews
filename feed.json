@@ -1,3 +1,11 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "date": "2026-06-19T14:57:00+05:30",
+      "label": "This is a tes",
+      "image": "images/boy_and_dog_202604211733.jpeg",
+      "category": "entertainment",
+      "text": "Testing testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testinTesting testing testin"
+    }
+  ]
 }
