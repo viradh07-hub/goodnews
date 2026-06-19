@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoodNews | Premium Editorial Feed</title>
+    
+    <!-- IMPORT GOOGLE ROBOTO SANS ENGINE -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
         /* FLIPBOARD PREMIUM DARK THEME ACCENTS */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -40,13 +46,20 @@
             text-decoration: none; 
             color: #ffffff; 
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
         }
-        .logo span {
+        .logo .brand-badge {
             background: #f02828; /* Flipboard Red Accent Block */
-            color: #fff;
-            padding: 2px 8px;
-            margin-right: 4px;
-            display: inline-block;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 2px;
+            margin-right: 10px;
+            font-style: normal;
+            font-size: 22px;
+            letter-spacing: 0px;
         }
         .tagline { 
             font-size: 11px; 
@@ -159,9 +172,11 @@
             transform: scale(1.05);
         }
         
+        /* CONTENT BODY SPECIFICALLY ENHANCED WITH ROBOTO SANS */
         .news-context { 
             padding: 20px; 
-            font-size: 14px; 
+            font-family: 'Roboto', sans-serif;
+            font-size: 14.5px; 
             line-height: 1.6; 
             color: #e1e3e6; 
             font-weight: 400;
@@ -263,7 +278,8 @@
 
     <header>
         <div class="nav-container">
-            <a href="#" class="logo"><span>F</span>goodnews</a>
+            <!-- REFINED GN LOGO MODULE -->
+            <a href="#" class="logo"><span class="brand-badge">GN</span>goodnews</a>
             <div class="tagline">The Positivity Feed</div>
         </div>
     </header>
@@ -343,7 +359,6 @@
                                     <button class="reaction-btn" onclick="handleReact(this)">❤️ <span>0</span></button>
                                     <button class="reaction-btn" onclick="handleReact(this)">🔥 <span>0</span></button>
                                 </div>
-                                <!-- THE CORRECTED VERCEL LINK IS DETAILED DIRECTLY HERE BELOW -->
                                 <a href="https://api.whatsapp.com/send?text=Check out this update on GoodNews! https://goodnews-xb65-git-main-viradh07-hubs-projects.vercel.app" target="_blank" class="share-whatsapp">Share Story 📲</a>
                             </div>
                             <div class="comment-trigger" onclick="toggleComments('${cardUniqueId}')">💬 Inside Discussion</div>
@@ -358,7 +373,6 @@
             }
         }
 
-        // Rest of layout handlers...
         function filterCategory(category) {
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
