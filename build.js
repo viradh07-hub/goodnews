@@ -1,45 +1,51 @@
 const fs = require('fs');
 const path = require('path');
 
-// Tell the script where to find your new articles
 const postsDir = path.join(__dirname, 'content', 'posts');
 let combinedFeed = [];
 
-// Scoop up every article and format it for the live feed
+// Check if you have published any articles yet
 if (fs.existsSync(postsDir)) {
     const files = fs.readdirSync(postsDir);
     
     files.forEach(file => {
         if (file.endsWith('.md')) {
             const content = fs.readFileSync(path.join(postsDir, file), 'utf8');
-            const lines = content.split('\n');
             
-            // Set defaults so the feed never breaks
-            let post = { date: new Date().toISOString(), category: 'all' };
-            let isBody = false;
-            let bodyText = "";
+            // Sveltia CMS saves files with "---" separating settings from body text
+            const parts = content.split('---');
             
-            lines.forEach(line => {
-                if (line.startsWith('---')) return;
+            if (parts.length >= 3) {
+                const frontmatter = parts[1];
+                const bodyText = parts.slice(2).join('---').trim();
                 
-                // Map the CMS fields to the Live Site fields
-                if (line.startsWith('headline:')) {
-                    post.label = line.replace('headline:', '').trim().replace(/['"]/g, '');
-                } else if (line.startsWith('image:')) {
-                    post.image = line.replace('image:', '').trim().replace(/['"]/g, '');
-                } else if (line.startsWith('body:')) {
-                    isBody = true;
-                } else if (isBody) {
-                    bodyText += line + " ";
-                }
-            });
-            
-            post.text = bodyText.trim() || "Tap to read more...";
-            combinedFeed.push(post);
+                let post = { 
+                    date: new Date().toISOString(), 
+                    text: bodyText || "Tap to read more..." 
+                };
+                
+                // Read the hidden settings block
+                const lines = frontmatter.split('\n');
+                lines.forEach(line => {
+                    if (line.includes(':')) {
+                        const [key, ...rest] = line.split(':');
+                        const value = rest.join(':').trim().replace(/^['"]|['"]$/g, ''); // Clean up quotes
+                        
+                        if (key.trim() === 'headline') post.label = value;
+                        if (key.trim() === 'image') post.image = value;
+                        if (key.trim() === 'category') post.category = value;
+                    }
+                });
+                
+                // Fallback if no category is selected
+                if (!post.category) post.category = 'all';
+                
+                combinedFeed.push(post);
+            }
         }
     });
 }
 
-// Save the assembled magazine feed for the website to read
+// Write the final master feed for the website to display
 fs.writeFileSync(path.join(__dirname, 'feed.json'), JSON.stringify(combinedFeed));
 console.log("Successfully generated live feed from your content repository!");
