@@ -1,0 +1,25 @@
+backend:
+  name: github
+  repo: viradh-07/goodnews
+  branch: main
+
+media_folder: "images"
+
+collections:
+  - name: "content_desk"
+    label: "GoodNews Content Desk"
+    files:
+      - name: "feed_file"
+        label: "Live News Cards List"
+        file: "feed.json"
+        format: "json"
+        fields:
+          - name: "posts"
+            label: "News Cards Feed"
+            widget: "list"
+            fields:
+              - { label: "Date Header (e.g. Today • June 19)", name: "date", widget: "string" }
+              - { label: "Filter Category Code (lowercase)", name: "category", widget: "select", options: ["entertainment", "lifestyle", "sports", "international", "offbeat", "business", "tech-ai"] }
+              - { label: "Visible Badge Text (e.g. Sports)", name: "label", widget: "string" }
+              - { label: "News Card Image URL", name: "image", widget: "string" }
+              - { label: "News Summary Context (Max 200 Chars)", name: "text", widget: "text" }
