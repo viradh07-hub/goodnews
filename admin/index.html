@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoodNews | Content Desk Panel</title>
-    <!-- STEP 1: Tell the browser exactly where config.yml is using a standard relation link tag -->
+    <!-- STEP 1: Route our config file location -->
     <link rel="cms-config-url" type="text/yaml" href="./config.yml">
     
-    <!-- STEP 2: Load Netlify Identity Gateway Token Handshake -->
+    <!-- STEP 2: Load the secure Netlify Identity token handler -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-    <!-- STEP 3: Load the Core UI Engine last -->
+    <!-- STEP 3: Load the Core UI Engine -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
 </html>
