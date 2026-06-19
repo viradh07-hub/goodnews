@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: viradh-07/goodnews # Matches your repository name layout path
+  repo: viradh-07/goodnews
   branch: main
   base_url: https://goodnews-xb65-git-main-viradh07-hubs-projects.vercel.app
 
@@ -8,21 +8,16 @@ media_folder: "images"
 public_folder: "images"
 
 collections:
-  - name: "news_desk"
-    label: "GoodNews Editorial Desk"
-    files:
-      - name: "feed_file"
-        label: "Add Content Tab"
-        file: "feed.json"
-        format: "json"
-        fields:
-          - name: "posts"
-            label: "Added Content Feed (Manage/Edit Existing Cards)"
-            widget: "list"
-            summary: "{{fields.label}} - {{fields.text}}"
-            fields:
-              - { label: "System Timestamp", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ssZ", date_format: "YYYY-MM-DD", time_format: "HH:mm", default: "", required: true }
-              - { label: "Headline / Category Label", name: "label", widget: "string", hint: "e.g., Entertainment, Sports, International" }
-              - { label: "Filter Category Code (lowercase match)", name: "category", widget: "select", options: ["entertainment", "lifestyle", "sports", "international", "offbeat", "business", "tech-ai"] }
-              - { label: "Upload News Card Image", name: "image", widget: "image" }
-              - { label: "News Content Body", name: "text", widget: "text" }
+  - name: "news_feed"
+    label: "Editorial Stream"
+    label_singular: "News Card"
+    folder: "content/posts" # Decap separates layout rendering natively for lists vs creation files
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{label}} - {{text}}"
+    fields:
+      - { label: "System Timestamp", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ssZ", date_format: "YYYY-MM-DD", time_format: "HH:mm", required: true }
+      - { label: "Headline / Category Label", name: "label", widget: "string", hint: "e.g., Entertainment, Sports, International" }
+      - { label: "Filter Category Code (lowercase match)", name: "category", widget: "select", options: ["entertainment", "lifestyle", "sports", "international", "offbeat", "business", "tech-ai"] }
+      - { label: "Upload News Card Image", name: "image", widget: "image" }
+      - { label: "News Content Body Summary", name: "text", widget: "text" }
