@@ -5,8 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoodNews | Editorial Desk</title>
     <link rel="cms-config-url" type="text/yaml" href="./config.yml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Load the Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-    <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    
+    <script>
+        // THIS IS THE FIX: Tell Vercel to route the login through your free Netlify Auth Server
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.init({
+                APIUrl: "https://goodnewsadmin.netlify.app/.netlify/identity"
+            });
+        }
+
+        const NewsPreview = createClass({
+            render: function() {
+                const entry = this.props.entry;
+                
+                const headline = entry.getIn(['data', 'headline']) || 'Type your bold headline here...';
+                const bodyText = entry.getIn(['data', 'body']) || 'Your article content will flow here...';
+                
+                const imageObj = entry.getIn(['data', 'image']);
+                let imageSrc = 'https://placehold.co/800x500/17191a/a0a5aa?text=Upload+Featured+Image';
+                
+                if (imageObj) {
+                    const asset = this.props.getAsset(imageObj);
+                    if (asset) { imageSrc = asset.toString(); }
+                    else { imageSrc = imageObj; }
+                }
+
+                return h('div', { style: { padding: '40px', background: '#0b0c0d', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' } },
+                    h('div', { style: { background: '#121415', border: '1px solid rgba(255,255,255,0.05)', width: '100%', maxWidth: '500px', overflow: 'hidden', display: 'flex', flexDirection: 'column' } },
+                        
+                        h('div', { style: { width: '100%', aspectRatio: '16/10', overflow: 'hidden', background: '#17191a' } },
+                            h('img', { src: imageSrc, style: { width: '100%', height: '100%', objectFit: 'cover' } })
+                        ),
+                        
+                        h('div', { style: { padding: '24px' } },
+                            h('h1', { style: { fontSize: '22px', fontWeight: '900', color: '#ffffff', marginBottom: '16px', lineHeight: '1.3', fontFamily: "'Roboto', sans-serif" } }, headline),
+                            h('div', { style: { fontSize: '15px', lineHeight: '1.7', color: '#e1e3e6', fontFamily: "'Roboto', sans-serif", fontWeight: '400' } }, bodyText)
+                        )
+                    )
+                );
+            }
+        });
+
+        CMS.registerPreviewTemplate("content_repository", NewsPreview);
+    </script>
 </body>
 </html>
