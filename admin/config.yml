@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: viradh07-hub/goodnews
+  repo: viradh-07/goodnews
   branch: main
   base_url: https://goodnews-xb65-git-main-viradh07-hubs-projects.vercel.app
 
@@ -17,5 +17,6 @@ collections:
     summary: "{{headline}}"
     fields:
       - { label: "Headline", name: "headline", widget: "string" }
+      - { label: "Category", name: "category", widget: "select", options: ["entertainment", "lifestyle", "sports", "international", "offbeat", "business", "tech-ai"] }
       - { label: "Featured Image", name: "image", widget: "image" }
       - { label: "Content Body", name: "body", widget: "markdown" }
