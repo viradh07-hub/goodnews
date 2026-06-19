@@ -21,14 +21,18 @@
                 const label = entry.getIn(['data', 'label']) || 'CATEGORY BADGE';
                 const text = entry.getIn(['data', 'text']) || 'Type your news content body summary in the editor window box to preview its card text flow...';
                 
-                // Get image source dynamically from the media upload stream
+                // CRASH PROTECTION: Safely look up image sources only if media streams are initialized
                 const mediaFiles = this.props.mediaFiles;
                 const imageObj = entry.getIn(['data', 'image']);
                 let imageSrc = 'https://placehold.co/400x400/f6f8fa/a0aec0?text=Upload+Image';
                 
                 if (imageObj) {
-                    const mediaFile = mediaFiles.find(file => file.get('path') === imageObj);
-                    imageSrc = mediaFile ? mediaFile.get('url') : imageObj;
+                    if (mediaFiles && typeof mediaFiles.find === 'function') {
+                        const mediaFile = mediaFiles.find(file => file.get('path') === imageObj);
+                        imageSrc = mediaFile ? mediaFile.get('url') : imageObj;
+                    } else {
+                        imageSrc = imageObj;
+                    }
                 }
 
                 // Generates a mock layout element of your actual live frontend website
