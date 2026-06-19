@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoodNews | Premium 4-Card Feed</title>
+    <title>GoodNews | Premium Continuous Feed</title>
+    <!-- Netlify Identity UI Bootstrapper Handshake -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f6f8fa; color: #1a1a1a; padding-bottom: 100px; -webkit-font-smoothing: antialiased; }
@@ -25,19 +27,15 @@
         }
         .filter-btn:hover, .filter-btn.active { background: #000000; color: #ffffff; border-color: #000; }
 
-        .feed-container { max-width: 1400px; margin: 0 auto; padding: 0 15px; }
-        .date-section-wrapper { margin-bottom: 40px; }
-        .date-separator { 
-            display: flex; align-items: center; margin: 40px 0 25px 0; 
-            font-size: 14px; font-weight: 700; color: #586069; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .date-separator::after { content: ""; flex: 1; margin-left: 15px; height: 1px; background: #e1e4e8; }
+        /* UNIFIED GRID LAYOUT: Cards will always fill rows horizontally up to 4 columns */
+        .feed-container { max-width: 1400px; margin: 0 auto; padding: 0 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 
-        .grid-layout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-
-        .post-card { background: #ffffff; border: 1px solid #e1e4e8; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; height: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .post-card { background: #ffffff; border: 1px solid #e1e4e8; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; height: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s ease; }
+        .post-card:hover { transform: translateY(-2px); }
         .card-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f3f5; }
         .card-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #0366d6; background: #f1f8ff; padding: 3px 8px; border-radius: 6px; }
+        .card-date { font-size: 11px; color: #888; font-weight: 500; }
+        
         .image-container { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #f6f8fa; }
         .image-container img { width: 100%; height: 100%; object-fit: cover; }
         .news-context { padding: 14px 16px 4px 16px; font-size: 13.5px; line-height: 1.45; color: #262626; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
@@ -57,11 +55,11 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center; aspect-ratio: 1 / 1;
         }
 
-        #loader { text-align: center; padding: 60px; font-size: 14px; color: #586069; font-weight: 600; }
+        #loader { grid-column: 1 / -1; text-align: center; padding: 60px; font-size: 14px; color: #586069; font-weight: 600; }
 
-        @media (max-width: 1200px) { .grid-layout { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 900px) { .grid-layout { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 576px) { .grid-layout { grid-template-columns: repeat(1, 1fr); gap: 16px; } header { padding: 12px 16px; } }
+        @media (max-width: 1200px) { .feed-container { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 900px) { .feed-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 576px) { .feed-container { grid-template-columns: repeat(1, 1fr); gap: 16px; } header { padding: 12px 16px; } }
     </style>
 </head>
 <body>
@@ -93,6 +91,24 @@
     <script>
         const DATA_SOURCE = 'feed.json';
 
+        // Custom Helper to transform standard ISO dates into readable card formats
+        function formatNewsDate(dateString) {
+            if(!dateString) return "Recently";
+            try {
+                const dateObj = new Date(dateString);
+                const options = { month: 'long', day: 'numeric' };
+                const formatted = dateObj.toLocaleDateString('en-US', options);
+                
+                const today = new Date();
+                if(dateObj.toDateString() === today.toDateString()) {
+                    return `Today • ${formatted}`;
+                }
+                return formatted;
+            } catch(e) {
+                return dateString;
+            }
+        }
+
         async function fetchContentFeed() {
             try {
                 const response = await fetch(DATA_SOURCE);
@@ -102,39 +118,29 @@
                 const container = document.getElementById('main-timeline-container');
                 container.innerHTML = ''; 
 
-                let currentDaySection = null;
-                let currentGridLayoutNode = null;
-                let previousDateHeader = "";
-
+                // Reverse loop so your absolute newest posts display first in line
                 for (let i = itemsList.length - 1; i >= 0; i--) {
                     const item = itemsList[i];
                     
-                    if (item.date !== previousDateHeader) {
-                        currentDaySection = document.createElement('div');
-                        currentDaySection.className = 'date-section-wrapper';
-                        currentDaySection.innerHTML = `<div class="date-separator">${item.date}</div>`;
-                        
-                        currentGridLayoutNode = document.createElement('div');
-                        currentGridLayoutNode.className = 'grid-layout';
-                        currentDaySection.appendChild(currentGridLayoutNode);
-                        
-                        container.appendChild(currentDaySection);
-                        previousDateHeader = item.date;
-                    }
-
+                    // Inject an ad card frame clean break after every 3 articles
                     if (i % 3 === 0 && i !== itemsList.length - 1) {
                         const adHTML = `
                             <div class="inline-ad-space">
                                 <p style="letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; font-size:10px; color:#a0aec0;">Sponsored Native Ad</p>
                                 <div style="font-size:13px; color:#a0aec0; border: 1px dashed #e2e8f0; padding: 20px; border-radius: 8px; width:100%;">AdSense Slot</div>
                             </div>`;
-                        currentGridLayoutNode.innerHTML += adHTML;
+                        container.innerHTML += adHTML;
                     }
 
                     const cardUniqueId = `box-${i}`;
+                    const displayDate = formatNewsDate(item.date);
+                    
                     const cardHTML = `
                         <div class="post-card" data-category="${item.category}">
-                            <div class="card-header"><span class="card-badge">${item.label}</span></div>
+                            <div class="card-header">
+                                <span class="card-badge">${item.label}</span>
+                                <span class="card-date">${displayDate}</span>
+                            </div>
                             <div class="image-container"><img src="${item.image}" alt="News Feed Media"></div>
                             <div class="news-context">${item.text}</div>
                             <div class="action-bar">
@@ -150,10 +156,10 @@
                             <div class="comment-drawer" id="${cardUniqueId}"><p style="color:#a1a1a1;">[Comments Plugin Node]</p></div>
                         </div>`;
                     
-                    currentGridLayoutNode.innerHTML += cardHTML;
+                    container.innerHTML += cardHTML;
                 }
             } catch (error) {
-                document.getElementById('loader').innerText = 'Please log in to your admin panel to create your very first news card entry!';
+                document.getElementById('loader').innerText = 'Log in to your admin panel to create your news card entry!';
                 console.error(error);
             }
         }
@@ -161,7 +167,7 @@
         function filterCategory(category) {
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
-            if(event) { event.target.classList.add('active'); }
+            if(window.event) { window.event.target.classList.add('active'); }
 
             const cards = document.querySelectorAll('.post-card');
             cards.forEach(card => {
