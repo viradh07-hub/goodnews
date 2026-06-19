@@ -1,57 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoodNews | Premium Content Desk</title>
-    <!-- Route config location -->
-    <link rel="cms-config-url" type="text/yaml" href="./config.yml">
-    <!-- Load Netlify Identity -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-</head>
-<body>
-    <!-- Load Decap CMS Engine -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+backend:
+  name: git-gateway
+  branch: main
 
-    <script>
-        const NewsPreview = createClass({
-            render: function() {
-                const entry = this.props.entry;
-                const label = entry.getIn(['data', 'label']) || 'CATEGORY BADGE';
-                const text = entry.getIn(['data', 'text']) || 'Type your news content body summary in the editor window box to preview its card text flow...';
-                
-                // Fetch image asset configuration
-                const imageObj = entry.getIn(['data', 'image']);
-                let imageSrc = 'https://placehold.co/400x400/f6f8fa/a0aec0?text=Upload+Image';
-                
-                if (imageObj) {
-                    // RESOLVE BLOB PATHS: Use getAsset helper to force render local asset memory objects instantly
-                    const asset = this.props.getAsset(imageObj);
-                    if (asset) {
-                        imageSrc = asset.toString();
-                    } else {
-                        imageSrc = imageObj;
-                    }
-                }
+media_folder: "images"
+public_folder: "images"
 
-                // Generates a mock layout element of your actual live frontend website
-                return h('div', { style: { padding: '24px', background: '#f6f8fa', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' } },
-                    h('div', { style: { background: '#ffffff', border: '1px solid #e1e4e8', borderRadius: '16px', width: '340px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' } },
-                        h('div', { style: { padding: '12px 16px', display: 'flex', justifyContent: 'between', borderBottom: '1px solid #f1f3f5', alignItems: 'center' } },
-                            h('span', { style: { fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: '#0366d6', background: '#f1f8ff', padding: '3px 8px', borderRadius: '6px' } }, label),
-                            h('span', { style: { fontSize: '11px', color: '#888', fontWeight: '500', marginLeft: 'auto' } }, 'Today • Preview')
-                        ),
-                        h('div', { style: { width: '100%', aspectRatio: '1/1', overflow: 'hidden', background: '#f6f8fa' } },
-                            h('img', { src: imageSrc, style: { width: '100%', height: '100%', objectFit: 'cover' } })
-                        ),
-                        h('div', { style: { padding: '14px 16px 20px 16px', fontSize: '13.5px', lineHeight: '1.45', color: '#262626' } }, text)
-                    )
-                );
-            }
-        });
-
-        // Register the template window to bind directly to the collection fields layout
-        CMS.registerPreviewTemplate("news_feed", NewsPreview);
-    </script>
-</body>
-</html>
+collections:
+  - name: "news_desk"
+    label: "GoodNews Editorial Desk"
+    files:
+      - name: "feed_file"
+        label: "Add Content Tab"
+        file: "feed.json"
+        format: "json"
+        fields:
+          - name: "posts"
+            label: "Added Content Feed (Manage/Edit Existing Cards)"
+            widget: "list"
+            summary: "{{fields.label}} - {{fields.text}}"
+            fields:
+              - { label: "System Timestamp", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ssZ", date_format: "YYYY-MM-DD", time_format: "HH:mm", default: "", required: true }
+              - { label: "Headline / Category Label", name: "label", widget: "string", hint: "e.g., Entertainment, Sports, International" }
+              - { label: "Filter Category Code (lowercase match)", name: "category", widget: "select", options: ["entertainment", "lifestyle", "sports", "international", "offbeat", "business", "tech-ai"] }
+              - { label: "Upload News Card Image", name: "image", widget: "image" }
+              - { label: "News Content Body", name: "text", widget: "text" }
