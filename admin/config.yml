@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: viradh-07/goodnews
+  repo: viradh07-hub/goodnews
   branch: main
   base_url: https://goodnews-xb65-git-main-viradh07-hubs-projects.vercel.app
 
