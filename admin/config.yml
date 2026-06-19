@@ -5,21 +5,18 @@ backend:
 media_folder: "images"
 public_folder: "images"
 
+# Changes file system to folder collection mode for distinct dashboard views
 collections:
-  - name: "content_desk"
-    label: "GoodNews Content Desk"
-    files:
-      - name: "feed_file"
-        label: "Live News Cards List"
-        file: "feed.json"
-        format: "json"
-        fields:
-          - name: "posts"
-            label: "News Cards Feed"
-            widget: "list"
-            fields:
-              - { label: "Date Header (e.g. Today • June 19)", name: "date", widget: "string" }
-              - { label: "Filter Category Code (lowercase)", name: "category", widget: "select", options: ["entertainment", "lifestyle", "sports", "international", "offbeat", "business", "tech-ai"] }
-              - { label: "Visible Badge Text (e.g. Sports)", name: "label", widget: "string" }
-              - { label: "Upload News Card Image", name: "image", widget: "image" }
-              - { label: "News Summary Context (Max 200 Chars)", name: "text", widget: "text" }
+  - name: "news_feed"
+    label: "News Cards Feed"
+    label_singular: "News Card"
+    folder: "content/posts"
+    create: true # This explicitly enables the "Add Content" workspace tab
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    fields:
+      - { label: "System Generated Date", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ssZ", date_format: "YYYY-MM-DD", time_format: "HH:mm", default: "", required: true }
+      - { label: "News Headline / Category Label", name: "label", widget: "string", hint: "e.g., Entertainment, Sports, International" }
+      - { label: "Upload News Card Image", name: "image", widget: "image" }
+      - { label: "News Content Body", name: "text", widget: "text", hint: "Max 200 characters context summary" }
